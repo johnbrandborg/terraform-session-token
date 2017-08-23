@@ -5,10 +5,10 @@ from os import path
 from shutil import copyfile
 from uuid import uuid4
 
-awsDefaultRole = "Administration"
+awsDefaultRole = "AdminRole"
 awsCredentialsFile = path.expanduser("~/.aws/credentials")
 awsCredentialsProfile = "[session_token]"
-SessionDuration = 900
+sessionDuration = 900
 
 def getMfaSerial(user):
     iam = boto3.client('iam')
