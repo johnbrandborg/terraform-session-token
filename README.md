@@ -54,14 +54,14 @@ Create a group with a policy to allow user accounts to assume the high privilege
       "Sid": "AllowGroupAssumeAdminRole",
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
-      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/AdminRole"
+      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/CloudAdminRole"
     }
   ]
 }
 ```
 The high privilege access role has a trust policy that enforces the use of MFA.
 
-#### Admin Role Trust Policy (JSON)
+#### Cloud Admin Role Trust Policy (JSON)
 ```
 {
   "Version": "2012-10-17",
