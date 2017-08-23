@@ -8,7 +8,7 @@ from uuid import uuid4
 awsDefaultRole = "AdminRole"
 awsCredentialsFile = path.expanduser("~/.aws/credentials")
 awsCredentialsProfile = "[session_token]"
-sessionDuration = 900
+sessionDuration = 3600
 
 def getMfaSerial(user):
     iam = boto3.client('iam')
