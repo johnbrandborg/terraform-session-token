@@ -164,9 +164,9 @@ data "aws_iam_policy_document" "admin_trust" {
 Terraform
 ---------
 
-With a valid session_token profile Terraform Backend and AWS Provider blocks can be setup to use the new profile.  If you are using S3 for backend state files ensure the Role has access to the Bucket and DynamoDB Table for state lock.
+With a valid session_token profile Terraform Backend, Remote_State and the AWS Provider blocks can be setup to use the new profile.  If you are using S3 for backend state files ensure the Role has access to the Bucket and DynamoDB Table for state lock.
 
-**Terraform (HCL) Example:**
+**Main.tf (HCL) Example:**
 ```hcl
 terraform {
     required_version = ">= 0.10.2"
@@ -184,6 +184,20 @@ terraform {
 provider "aws" {
     region  = "us-east-1"
     profile = "terraform_session"
+}
+```
+
+**Variables.tf (HCL) Example:**
+```
+data "terraform_remote_state" "example" {
+  backend = "s3"
+
+  config {
+    bucket = "infrastructure-as-code"
+    key    = "example/terraform.tfstate"
+    region = "us-east-1"
+    profile = "terraform_session"
+  }
 }
 ```
 
