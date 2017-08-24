@@ -7,7 +7,7 @@ from uuid import uuid4
 
 awsDefaultRole = "AdminRole"
 awsCredentialsFile = path.expanduser("~/.aws/credentials")
-awsCredentialsProfile = "[session_token]"
+awsCredentialsProfile = "[terraform_session_token]"
 sessionDuration = 3600
 
 def getMfaSerial(user):
@@ -38,13 +38,13 @@ def writeToken(file, profile, token):
         secretKey = "aws_secret_access_key = " + token['Credentials']['SecretAccessKey']
         sessionToken = "aws_session_token = " + token['Credentials']['SessionToken']
         if profile in dataList:
-            print("\nUpdating the credentials details")
+            print("\nUpdating the profile in the credentials file")
             profileSection = dataList.index(profile)
             dataList[profileSection + 1] = accessKey
             dataList[profileSection + 2] = secretKey
             dataList[profileSection + 3] = sessionToken
         else:
-            print("\nAdding the credentials details")
+            print("\nAdding the profile to the credentials file")
             dataList.append("")
             dataList.append(profile)
             dataList.append(accessKey)
@@ -54,10 +54,10 @@ def writeToken(file, profile, token):
         outFile.write("\n".join(dataList))
 
 def main():
-    print("\nAWS Session Token Generator\nHit Enter on Role for Default\n")
+    print("\nTerraform Session Token\nHit Enter on Role for Default\n")
     userName = input('Username: ')
     mfaSerial = getMfaSerial(userName)
-    enteredRole = input("Role [%s]: " % awsDefaultRole)
+    enteredRole = input("Role[%s]: " % awsDefaultRole)
     selectedRole = enteredRole if enteredRole else awsDefaultRole
     mfaCode = input("Code: ")
     sessionToken = getSessionToken(selectedRole, mfaSerial, mfaCode)
