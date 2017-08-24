@@ -44,7 +44,7 @@ terraform-session-token will prompt for details to be entered and update the AWS
 
 Once you have authenticated you should have new profile listed within the AWS Crendentials file located in your home directory.
 
-    [terraform_session_token]
+    [terraform_session]
     aws_access_key_id = AQIEIGHLPWAHLYFCDICA
     aws_secret_access_key = VkFbHUsHvZ6HAT29w2seWdVzLUCQ/egg7A
     aws_session_token = FQoDYXdzEOv\\\\\\\wEaDJZOEU69XfSIMDva3CLnASu3rGJvN8yW3oEbbhPwLiUb6AtqeILq3BmZR1Qr6bze8xlcwKdLZAoStT4drIlhuH7vQl1EaIDXT/AAeopW9siFupGnes+jTJXLMKmfslkngdlsndgVZWalDkRiH6Bg9ZgdkMXX34AV6Ro7MDpOwRVsRe+8/OSQPdtEPDBTfrSPTyALMSDFInieiownroiFJIlwEDsrBdd379ST3Gmftav4T4E9n4R1sxrVhtPqm0tvK7Y1lfgAJgftK+W4mwceygE27Q5xFnYaVxAHfd87dFSZvQLfRt5WIOEMZMZOjVDYCjGofXMBQ==
@@ -56,7 +56,7 @@ Create a IAM Group with a policy to allow user accounts to assume the high privi
 
 ### User Group Access Policy
 
-Least Privileged Principles apply. The 'terraform_session_token' tool uses IAM to collect some details to make the AssumeRole Call.
+Least Privileged Principles apply. The 'terraform_session' tool uses IAM to collect some details to make the AssumeRole Call.
 
 #### AWS (JSON) Example
 ```json
@@ -76,7 +76,7 @@ Least Privileged Principles apply. The 'terraform_session_token' tool uses IAM t
       "Sid": "AllowGroupAssumeAdminRole",
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
-      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/CloudAdminRole"
+      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/AdminRole"
     }
   ]
 }
@@ -177,13 +177,13 @@ terraform {
         region         = "us-east-1"
         encrypt        = "true"
         dynamodb_table = "terraform"
-        profile        = "terraform_session_token"
+        profile        = "terraform_session"
     }
 }
 
 provider "aws" {
     region  = "us-east-1"
-    profile = "terraform_session_token"
+    profile = "terraform_session"
 }
 ```
 

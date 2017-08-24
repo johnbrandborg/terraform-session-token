@@ -7,7 +7,7 @@ from uuid import uuid4
 
 awsDefaultRole = "AdminRole"
 awsCredentialsFile = path.expanduser("~/.aws/credentials")
-awsCredentialsProfile = "[terraform_session_token]"
+awsCredentialsProfile = "[terraform_session]"
 sessionDuration = 3600
 
 def getMfaSerial(user):
