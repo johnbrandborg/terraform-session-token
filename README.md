@@ -1,12 +1,12 @@
 terraform-session-token
 =================
 
-A small AWS MFA authentication tool to create a session token for an assumed role and updated the AWS credentials file for Terraform.
+A small AWS MFA authentication tool to create a session token for an assumed role and updates the AWS credentials file for Terraform.
 
 Why?
 ----
 
-Terraform itself currently has no means of MFA support.  Terraform on execution will attempt a number way to find AWS API keys. Unfortunately when you define a profile for AWS CLI MFA in the credentials file, no keys are actually defined so Terraform can't use this setup.
+The standard version of Terraform currently has no means of MFA support with AWS.  Terraform on execution will attempt a number way to find AWS API keys. Unfortunately when you define a profile for AWS CLI MFA in the credentials file, no keys are actually defined so Terraform can't use this setup.
 
 Using 'terraform-session-token.py' the default profile is used only for assuming the high privilege access role, which has a condition that MFA must be supplied. Once Authenticated session token details are placed into the credentials for use by Terraform.
 
