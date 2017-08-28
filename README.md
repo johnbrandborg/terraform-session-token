@@ -29,6 +29,10 @@ Clone the repository or download the 'terraform-session-token.py' onto your syst
 
     git clone https://github.com/johnbrandborg/terraform-session-token
 
+Install the requisite python libraries (boto3):
+
+    pip install -r requirements.txt
+
 ### Usage
 
 terraform-session-token will prompt for details to be entered and update the AWS CLI credential files with a profile that Terraform is able to use.
