@@ -27,7 +27,7 @@ What things you will need to install and configure
 
 Clone the repository or download the 'terraform-session-token.py' onto your system.
 
-    git clone https://github.com/johnbrandborg/terraform-session-token
+    git clone https://github.com/johnbrandborg/terraform-session-token.git
 
 ### Usage
 
