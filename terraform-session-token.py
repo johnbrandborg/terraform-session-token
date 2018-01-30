@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+A small AWS Multi Factor Authentication tool to create a session token
+for an assumed role and updates the AWS credentials file for Terraform.
+"""
 
 import argparse
 from sys import stderr, exit as sysexit
@@ -42,16 +46,16 @@ def get_mfa_serial():
     """
     Collects the MFA Serial Number of the IAM User Account
 
-    :type user: string
-    :param user: The Name of the User Account within IAM
-
-    :return: ARN of the MFA
+    :return: ARN of the MFA device
     """
     try:
         global ARGS
         iam_client = client('iam', verify=ARGS.v)
         user_name = iam_client.get_user()['User']['UserName']
-        serial = iam_client.list_mfa_devices(UserName=user_name, MaxItems=1)["MFADevices"][0]["SerialNumber"]
+        serial = iam_client.list_mfa_devices(
+            UserName=user_name,
+            MaxItems=1
+            )["MFADevices"][0]["SerialNumber"]
     except ClientError as err:
         print("\nError: %s, Exiting" % err.response, file=stderr)
         sysexit(1)
@@ -62,19 +66,13 @@ def get_mfa_serial():
 
 def get_session_token(role, code):
     """
-    Collects the Session Token from STS using the MFA ARN and Code.
+    Collects the Session Token from STS using the Terraform Role and MFA Code.
 
     :type role: string
     :param role: Name of the Role to be Assumed in the form of ARN
 
-    :type serial: string
-    :param serial: MFA device serial number in the form of ARN
-
     :type code: integer
     :param code: 6 digit code from the MFA device
-
-    :type duration: integer
-    :param duration: Time in seconds the token will be valid
 
     :return: Token details
     """
