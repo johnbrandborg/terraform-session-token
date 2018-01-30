@@ -1,7 +1,7 @@
-terraform-session-token
+Terraform Session Token (MFA)
 =================
 
-A small AWS MFA authentication tool to create a session token for an assumed role and updates the AWS credentials file for Terraform.
+A small AWS Multi Factor Authentication tool to create a session token for an assumed role and updates the AWS credentials file for Terraform.
 
 Why?
 ----
@@ -33,14 +33,15 @@ Clone the repository or download the 'terraform-session-token.py' onto your syst
 
 terraform-session-token will prompt for details to be entered and update the AWS CLI credential files with a profile that Terraform is able to use.
 
-    prompt$ ./terraform-session-token.py
+  Terraform Session Token
+  Hit Enter on Role for Default
 
-    Terraform Session Token
-    Hit Enter on Role for Default
+  Role[TerraformRole]: myCustomRole
+  Code: 121314
 
-    Username: jsmith
-    Role[AdminRole]: 'enter'
-    Code: 123456
+  Updating the profile [terraform_session] in the credentials file
+
+There are some options you can set also when running terraform-session-token, which can be viewed by setting the '-h' or '--help' parameter.
 
 Once you have authenticated you should have new profile listed within the AWS Crendentials file located in your home directory.
 
@@ -68,15 +69,16 @@ Least Privileged Principles apply. The 'terraform_session' tool uses IAM to coll
       "Effect": "Allow",
       "Action": [
         "iam:ListMFADevices",
-        "iam:GetRole"
+        "iam:GetRole",
+        "iam:GetUser"
       ],
       "Resource": "*"
     },
     {
-      "Sid": "AllowGroupAssumeAdminRole",
+      "Sid": "AllowGroupAssumeTerraformRole",
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
-      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/AdminRole"
+      "Resource": "arn:aws:iam::xxxxxxxxxxxx:role/TerraformRole"
     }
   ]
 }
@@ -84,13 +86,13 @@ Least Privileged Principles apply. The 'terraform_session' tool uses IAM to coll
 
 #### Terraform (HCL) Example
 ```hcl
-resource "aws_iam_policy" "assume_admin" {
-  name        = "AssumeAdministration"
-  description = "Provides the ability to Assume the Admin Role"
-  policy      = "${data.aws_iam_policy_document.assume_admin.json}"
+resource "aws_iam_policy" "assume_terraform" {
+  name        = "AssumeTerraformRole"
+  description = "Provides the ability to Assume the Terraform Role"
+  policy      = "${data.aws_iam_policy_document.assume_terraform.json}"
 }
 
-data "aws_iam_policy_document" "assume_admin" {
+data "aws_iam_policy_document" "assume_terraform" {
   statement {
     actions = [
       "iam:GetRole",
@@ -106,7 +108,7 @@ data "aws_iam_policy_document" "assume_admin" {
   }
 ```
 
-### Admin Role Trust Policy
+### Terraform Role Trust Policy
 
 The high privilege access role has a trust policy that enforces the use of MFA.
 
@@ -134,13 +136,13 @@ The high privilege access role has a trust policy that enforces the use of MFA.
 
 **Terraform (HCL) Example:**
 ```hcl
-resource "aws_iam_role" "admin" {
-  name               = "AdminRole"
-  description        = "High Privileged Access for Administrators"
-  assume_role_policy = "${data.aws_iam_policy_document.admin_trust.json}"
+resource "aws_iam_role" "terraform" {
+  name               = "TerraformRole"
+  description        = "High Privileged Access for Terraform"
+  assume_role_policy = "${data.aws_iam_policy_document.terraform_trust.json}"
 }
 
-data "aws_iam_policy_document" "admin_trust" {
+data "aws_iam_policy_document" "terraform_trust" {
   statement {
     principals {
       type = "AWS"
