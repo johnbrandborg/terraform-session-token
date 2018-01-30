@@ -95,8 +95,9 @@ resource "aws_iam_policy" "assume_terraform" {
 data "aws_iam_policy_document" "assume_terraform" {
   statement {
     actions = [
-      "iam:GetRole",
       "iam:ListMFADevices",
+      "iam:GetRole",
+      "iam:GetUser",
     ]
 
     resources = ["*"]
@@ -104,7 +105,7 @@ data "aws_iam_policy_document" "assume_terraform" {
 
   statement {
     actions   = ["sts:AssumeRole"]
-    resources = ["${aws_iam_role.admin.arn}"]
+    resources = ["${aws_iam_role.terraform.arn}"]
   }
 ```
 
