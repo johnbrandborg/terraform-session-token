@@ -33,15 +33,15 @@ Clone the repository or download the 'terraform-session-token.py' onto your syst
 
 terraform-session-token will prompt for details to be entered and update the AWS CLI credential files with a profile that Terraform is able to use.
 
-  Terraform Session Token
-  Hit Enter on Role for Default
+    Terraform Session Token
+    Hit Enter on Role for Default
 
-  Role[TerraformRole]: myCustomRole
-  Code: 121314
+    Role[TerraformRole]: myCustomRole
+    Code: 121314
 
-  Updating the profile [terraform_session] in the credentials file
+    Updating the profile [terraform_session] in the credentials file
 
-There are some options you can set also when running terraform-session-token, which can be viewed by setting the '-h' or '--help' parameter.
+There are some arguments you can use when running terraform-session-token, which can be viewed by parsing the '-h' or '--help' parameter.
 
 Once you have authenticated you should have new profile listed within the AWS Crendentials file located in your home directory.
 
