@@ -9,7 +9,7 @@ from sys import stderr, exit as sysexit
 from os import path
 from shutil import copyfile
 from uuid import uuid4
-from boto3 import client
+from boto3 import client, session
 from botocore.exceptions import ClientError, NoCredentialsError, ParamValidationError
 
 ARGPARSER = argparse.ArgumentParser(
@@ -26,9 +26,17 @@ ARGPARSER.add_argument(
 ARGPARSER.add_argument(
     "-p",
     type=str,
+    default="default",
+    metavar="default",
+    help="shared credential profile to use (Access & Secret)",
+    required=False
+    )
+ARGPARSER.add_argument(
+    "-s",
+    type=str,
     default="terraform_session",
     metavar="terraform_session",
-    help="profile name for the Session Token",
+    help="profile name for the Session Token to produce",
     required=False
     )
 ARGPARSER.add_argument(
@@ -38,38 +46,43 @@ ARGPARSER.add_argument(
     required=False
     )
 ARGS = ARGPARSER.parse_args()
+
 AWS_DEFAULT_ROLE = "TerraformRole"
 AWS_CREDENTIALS_FILE = path.expanduser("~/.aws/credentials")
-AWS_CREDENTIALS_PROFILE = "[%s]" % ARGS.p
+AWS_CREDENTIALS_PROFILE = "[%s]" % ARGS.s
 
-def get_mfa_serial():
+def get_account_details():
     """
     Collects the MFA Serial Number of the IAM User Account
 
-    :return: ARN of the MFA device
+    :return: ARN of the MFA device, and Username
     """
     try:
         global ARGS
-        iam_client = client('iam', verify=ARGS.v)
+        new_session = session.Session(profile_name=ARGS.p)
+        iam_client = new_session.client('iam', verify=ARGS.v)
         user_name = iam_client.get_user()['User']['UserName']
         serial = iam_client.list_mfa_devices(
             UserName=user_name,
             MaxItems=1
             )["MFADevices"][0]["SerialNumber"]
     except ClientError as err:
-        print("\nError: %s, Exiting" % err.response, file=stderr)
+        print("\n%s, Exiting" % err, file=stderr)
         sysexit(1)
     except NoCredentialsError as err:
-        print("\nError: %s, Exiting" % err, file=stderr)
+        print("\n%s, Exiting" % err, file=stderr)
         sysexit(1)
-    return serial
+    return serial, user_name
 
-def get_session_token(role, code):
+def get_session_token(role, serial, code):
     """
     Collects the Session Token from STS using the Terraform Role and MFA Code.
 
     :type role: string
     :param role: Name of the Role to be Assumed in the form of ARN
+
+    :type serial: string
+    :param serial: Name of the MFA Device to be used in the form of ARN
 
     :type code: integer
     :param code: 6 digit code from the MFA device
@@ -78,10 +91,10 @@ def get_session_token(role, code):
     """
     try:
         global ARGS
-        iam_client = client('iam', verify=ARGS.v)
-        sts_client = client('sts', verify=ARGS.v)
+        new_session = session.Session(profile_name=ARGS.p)
+        iam_client = new_session.client('iam', verify=ARGS.v)
+        sts_client = new_session.client('sts', verify=ARGS.v)
         role_arn = iam_client.get_role(RoleName=role)["Role"]["Arn"]
-        serial = get_mfa_serial()
         session_id = str(uuid4())
         token = sts_client.assume_role(
             DurationSeconds=ARGS.d,
@@ -91,10 +104,10 @@ def get_session_token(role, code):
             TokenCode=code
             )
     except ClientError as err:
-        print("\nError: %s, Exiting" % err, file=stderr)
+        print("\n%s, Exiting" % err, file=stderr)
         sysexit(1)
     except ParamValidationError as err:
-        print("\nError: %s, Exiting" % err, file=stderr)
+        print("\n%s, Exiting" % err, file=stderr)
         sysexit(1)
     return token
 
@@ -140,10 +153,12 @@ def main():
     """
     try:
         print("\nTerraform Session Token\nHit Enter on Role for Default\n")
+        mfa_serial, user_name = get_account_details()
+        print("User Name: " + user_name)
         entered_role = input("Role[%s]: " % AWS_DEFAULT_ROLE)
         selected_role = entered_role if entered_role else AWS_DEFAULT_ROLE
         mfa_code = input("Code: ")
-        session_token = get_session_token(selected_role, mfa_code)
+        session_token = get_session_token(selected_role, mfa_serial, mfa_code)
         write_token(AWS_CREDENTIALS_FILE, AWS_CREDENTIALS_PROFILE, session_token)
         print("Completed.")
     except KeyboardInterrupt:
