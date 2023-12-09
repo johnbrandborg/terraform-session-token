@@ -1,3 +1,6 @@
+:exclamation: This repository has been archived. I recommend using command line sign-in instead.
+https://docs.aws.amazon.com/signin/latest/userguide/command-line-sign-in.html
+
 Terraform Session Token (MFA)
 =================
 
